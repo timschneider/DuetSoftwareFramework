@@ -1,16 +1,15 @@
-using DuetAPI.ObjectModel.Boards;
-
-namespace DuetAPI.ObjectModel
+﻿namespace DuetAPI.ObjectModel
 {
     /// <summary>
     /// This represents information about closed-loop tuning
     /// </summary>
     public sealed class ClosedLoop : ModelObject
     {
-        public ClosedLoopPID Pid {
+        public ClosedLoopPID PID {
             get => _pid;
             set => SetPropertyValue(ref _pid, value);
         }
+
         private ClosedLoopPID _pid;
 
         /// <summary>

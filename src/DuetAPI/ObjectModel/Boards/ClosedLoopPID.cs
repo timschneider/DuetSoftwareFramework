@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DuetAPI.ObjectModel.Boards
+﻿namespace DuetAPI.ObjectModel
 {
     /// <summary>
     /// Details about the closed loop PID model.
