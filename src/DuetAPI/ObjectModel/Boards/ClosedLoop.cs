@@ -5,12 +5,14 @@
     /// </summary>
     public sealed class ClosedLoop : ModelObject
     {
-        public ClosedLoopPID PID {
+        /// <summary>
+        /// Details about Closed loop PID
+        /// </summary>
+        public ClosedLoopPID? PID {
             get => _pid;
             set => SetPropertyValue(ref _pid, value);
         }
-
-        private ClosedLoopPID _pid;
+        private ClosedLoopPID? _pid;
 
         /// <summary>
         /// Number of collected data points in the last run or 0 if it failed
