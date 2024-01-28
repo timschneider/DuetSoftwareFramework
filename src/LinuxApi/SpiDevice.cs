@@ -4,10 +4,15 @@ using System.Runtime.InteropServices;
 
 namespace LinuxApi
 {
+    public interface ISpiDevice
+    {
+        void TransferFullDuplex(ReadOnlySpan<byte> writeBuffer, Span<byte> readBuffer);
+    }
+
     /// <summary>
     /// Driver class for SPI transfers. Most of this is copied from the System.Device.Gpio library
     /// </summary>
-    public sealed class SpiDevice : IDisposable
+    public sealed class SpiDevice : ISpiDevice, IDisposable
     {
         private const uint SPI_IOC_MESSAGE_1 = 0x40206b00;
         private int _deviceFileDescriptor = -1;

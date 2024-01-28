@@ -28,9 +28,9 @@ namespace DuetControlServer.SPI
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         // General transfer variables
-        private static InputGpioPin _transferReadyPin = null!;
+        private static IInputGpioPin _transferReadyPin = null!;
         private static bool _expectedTfrRdyPinValue;
-        private static SpiDevice _spiDevice = null!;
+        private static ISpiDevice _spiDevice = null!;
         private static bool _waitingForFirstTransfer = true, _connected, _hadTimeout, _resetting, _updating;
         private static ushort _lastTransferNumber;
 
@@ -66,6 +66,16 @@ namespace DuetControlServer.SPI
         /// <exception cref="OperationCanceledException">Failed to connect to board</exception>
         public static void Init()
         {
+            Init(new InputGpioPin(Settings.GpioChipDevice, Settings.TransferReadyPin, $"dcs-trp-{Settings.TransferReadyPin}"),
+                       new SpiDevice(Settings.SpiDevice, Settings.SpiFrequency, Settings.SpiTransferMode));
+        }
+
+        /// <summary>
+        /// Set up the SPI device and the controller for the transfer ready pin
+        /// </summary>
+        /// <exception cref="OperationCanceledException">Failed to connect to board</exception>
+        public static void Init(IInputGpioPin transferReadyPin, ISpiDevice spiDevice)
+        {
             // Initialize TX header. This only needs to happen once
             Serialization.Writer.InitTransferHeader(ref _txHeader);
 
@@ -77,8 +87,8 @@ namespace DuetControlServer.SPI
             _txBuffer = _txBuffers.First!;
 
             // Initialize transfer ready pin and SPI device
-            _transferReadyPin = new InputGpioPin(Settings.GpioChipDevice, Settings.TransferReadyPin, $"dcs-trp-{Settings.TransferReadyPin}");
-            _spiDevice = new SpiDevice(Settings.SpiDevice, Settings.SpiFrequency, Settings.SpiTransferMode);
+            _transferReadyPin = transferReadyPin;
+            _spiDevice = spiDevice;
 
             // Check if large transfers can be performed
             try
@@ -1648,6 +1658,10 @@ namespace DuetControlServer.SPI
                         _logger.Warn("RepRapFirmware got a bad data checksum");
                         success = false;
                         return false;
+                    //case TransferResponse.BadHeaderChecksum:
+                    //    _logger.Warn("Restarting full transfer because RepRapFirmware received a bad header checksum response in data response");
+                    //    success = false;
+                    //    return true;
                     case TransferResponse.BadResponse:
                         _logger.Warn("Restarting full transfer because RepRapFirmware received a bad data response");
                         success = false;

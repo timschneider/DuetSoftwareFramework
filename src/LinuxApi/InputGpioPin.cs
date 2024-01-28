@@ -7,10 +7,21 @@ using System.Threading.Tasks;
 
 namespace LinuxApi
 {
+    public delegate void PinChangeDelegate(object sender, bool pinValue);
+
+    public interface IInputGpioPin
+    {
+        bool WaitForEvent(int timeout);
+        void FlushEvents();
+        bool Value { get; }
+        event PinChangeDelegate PinChanged;
+        Task StartMonitoring(CancellationToken cancellationToken = default);
+    }
+
     /// <summary>
     /// Class for event-based polling of pin level changes
     /// </summary>
-    public sealed class InputGpioPin : IDisposable
+    public sealed class InputGpioPin : IInputGpioPin, IDisposable
     {
         private const uint GPIO_GET_LINEEVENT_IOCTL = 0xc030b404;
         private const uint GPIOHANDLE_GET_LINE_VALUES_IOCTL = 0xc040b408;
@@ -226,7 +237,7 @@ namespace LinuxApi
         /// </summary>
         /// <param name="sender">Object invoking the callback</param>
         /// <param name="pinValue">New pin value</param>
-        public delegate void PinChangeDelegate(object sender, bool pinValue);
+        //public delegate void PinChangeDelegate(object sender, bool pinValue);
 
         /// <summary>
         /// Event to call when a pin change has occurreed
