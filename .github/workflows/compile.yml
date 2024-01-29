@@ -47,5 +47,5 @@ jobs:
       - name: Build DSF packages
         run: |
           cd pkg
-          ./build.sh --target-arch=armhf --dest-dir=./out
-          ./build.sh --target-arch=arm64 --dest-dir=./out
+          ./build.sh --target-arch=armhf --dest-dir=./out --packages=progs
+          ./build.sh --target-arch=arm64 --dest-dir=./out --packages=progs
