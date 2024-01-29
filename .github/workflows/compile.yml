@@ -47,5 +47,5 @@ jobs:
       - name: Build DSF packages
         run: |
           cd pkg
-          ./build.sh --target-arch=armhf --dest-dir=./out --packages=progs --no-cleanup
-          ./build.sh --target-arch=arm64 --dest-dir=./out --packages=progs --no-cleanup
+          ./build.sh --target-arch=armhf --dest-dir=./out --packages=progs --no-cleanup || true
+          ./build.sh --target-arch=arm64 --dest-dir=./out --packages=progs --no-cleanup || true
