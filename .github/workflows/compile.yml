@@ -49,3 +49,8 @@ jobs:
           cd pkg
           ./build.sh --target-arch=armhf --dest-dir=./out --packages=progs --no-cleanup || true
           ./build.sh --target-arch=arm64 --dest-dir=./out --packages=progs --no-cleanup || true
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: ./out/*/*.deb
