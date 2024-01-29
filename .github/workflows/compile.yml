@@ -1,0 +1,51 @@
+name: Build DSF packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+        - dev
+        - unstable-3.4
+        - stable-3.4
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Install NodeJS environment (TODO: Update to 16 when v3.5 is out)
+      - name: Set up NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      # Install .NET environment
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6
+
+      # Install required tools
+      - name: Install dependencies
+        run: sudo apt install -y dpkg-sig libxml2-utils
+      
+      # Import GPG key for package signing
+      #- name: Configure GPG key
+      #  run: |
+      #    echo -n "$GPG_SIGNING_KEY" | base64 --decode | gpg --import
+      #  env:
+      #    GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+
+      # Build DSF
+      - name: Build DSF packages
+        run: |
+          cd pkg
+          ./build.sh --target-arch=armhf --dest-dir=./out
+          ./build.sh --target-arch=arm64 --dest-dir=./out
