@@ -1593,7 +1593,12 @@ namespace DuetControlServer.SPI
                             _logger.Warn("Restarting full transfer because RepRapFirmware received a bad data response");
                             return false;
                         }
-                        if (responseCode != TransferResponse.Success)
+                        if (responseCode == TransferResponse.BadHeaderChecksum)
+                        {
+                            _logger.Warn("Note: RepRapFirmware is in ExchangeHeader state while DSF is in ExchangeData. Full Restart.");
+                            return false;
+                        }
+                        else if (responseCode != TransferResponse.Success)
                         {
                             _logger.Warn("Note: RepRapFirmware didn't receive valid data either (code 0x{0:x8})", responseCode);
                         }
