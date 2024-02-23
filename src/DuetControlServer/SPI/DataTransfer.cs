@@ -1596,23 +1596,23 @@ namespace DuetControlServer.SPI
                     {
                         _logger.Warn("Bad data CRC32 (expected 0x{0:x8}, got 0x{1:x8})", _rxHeader.ChecksumData32, crc32);
                         responseCode = ExchangeResponse(TransferResponse.BadDataChecksum);
-                        if (responseCode == TransferResponse.BadDataChecksum)
+                        switch(responseCode)
                         {
-                            _logger.Warn("Note: RepRapFirmware didn't receive valid data either (code 0x{0:x8})", responseCode);
-                        }
-                        else
-                        {
-                            if (responseCode == TransferResponse.BadResponse)
-                            {
+                            case TransferResponse.BadDataChecksum:
+                                _logger.Warn("Note: RepRapFirmware didn't receive valid data either (code 0x{0:x8})", responseCode);
+                                break;
+                            case TransferResponse.BadResponse:
                                 _logger.Warn("Restarting full transfer because RepRapFirmware received a bad data response");
-                            }
-                            else
-                            {
+                                return false;
+                            case TransferResponse.BadHeaderChecksum:
+                                _logger.Warn("Note: RepRapFirmware is in ExchangeHeader state while DSF is in ExchangeData. Full Restart.");
+                                return false;
+                            default:
                                 _logger.Warn("Restarting full transfer because an unexpected response code has been received (code 0x{0:x8})", responseCode);
                                 ExchangeResponse(TransferResponse.BadResponse);
-                            }
-                            return false;
+                                return false;
                         }
+
                         continue;
                     }
                 }
@@ -1664,6 +1664,10 @@ namespace DuetControlServer.SPI
                         _logger.Warn("RepRapFirmware got a bad data checksum");
                         success = false;
                         return false;
+                    case TransferResponse.BadHeaderChecksum:
+                        _logger.Warn("Restarting full transfer because RepRapFirmware received a bad header checksum response in data response");
+                        success = false;
+                        return true;
                     case TransferResponse.BadResponse:
                         _logger.Warn("Restarting full transfer because RepRapFirmware received a bad data response");
                         success = false;
